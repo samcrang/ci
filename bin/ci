@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+version() {
+  echo "CI 0.0.1"
+}
+
+project="$1"
+if [ -z "$project" ]; then
+  version
+  echo "usage: $0 <directory>"
+  exit 1
+fi
+
+if [ -d "$project" ]; then
+  if [ -f "$project/run.sh" ]; then
+    sh "$project/run.sh" 
+    if [ $? -ne 0 ]; then
+      echo "FAILURE"
+      exit 1
+    fi
+  else
+    echo "Cannot find run.sh"
+    exit 1
+  fi
+else 
+  echo "Directory '$project' does not exist."
+  exit 1
+fi
+
+echo "SUCCESS"
+exit 0
