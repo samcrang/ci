@@ -16,7 +16,7 @@
 @test "when invoked with a directory that does not exist should error" {
   run bin/ci foo 
   [ "$status" -eq 1 ]
-  [ $(expr "${lines[0]}" : "Directory 'foo' does not exist.") -ne 0 ]
+  [ "${lines[0]}" = "Directory 'foo' does not exist." ]
 }
 
 @test "when invoked with a directory that exists but does not contain a run.sh should error" {
@@ -34,13 +34,13 @@
 @test "when invoked with a valid project that has a run.sh that succeeds should execute teardown.sh" {
   run bin/ci tests/data/projects/tear_down_on_success
   [ "$status" -eq 0 ]
-  [ $(expr "${lines[0]}" : "Tear down") -ne 0 ]
-  [ $(expr "${lines[1]}" : "SUCCESS") -ne 0 ]
+  [ "${lines[0]}" = "Tear down" ]
+  [ "${lines[1]}" = "SUCCESS" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that fails should execute teardown.sh" {
   run bin/ci tests/data/projects/tear_down_on_failure
   [ "$status" -eq 1 ]
-  [ $(expr "${lines[0]}" : "Tear down") -ne 0 ]
-  [ $(expr "${lines[1]}" : "FAILURE") -ne 0 ]
+  [ "${lines[0]}" = "Tear down" ]
+  [ "${lines[1]}" = "FAILURE" ]
 }
