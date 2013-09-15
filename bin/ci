@@ -12,12 +12,17 @@ teardown() {
   fi
 }
 
+setup() {
+  project="$1"
+  if [ -f "$project/setup.sh" ]; then
+    bash "$project/setup.sh"
+  fi
+}
+
 run_project() {
   if [ -d "$project" ]; then
     if [ -f "$project/run.sh" ]; then
-      if [ -f "$project/setup.sh" ]; then
-        bash "$project/setup.sh"
-      fi
+      setup "$project"
       set +e
       bash "$project/run.sh" 
       status=$?
