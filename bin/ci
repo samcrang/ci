@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-version() {
+usage() {
   echo "CI 0.0.1"
+  echo "usage: $0 <directory>"
 }
 
 teardown() {
@@ -37,19 +38,28 @@ run_project() {
   fi
 }
 
-project="$1"
-if [ -z "$project" ]; then
-  version
-  echo "usage: $0 <directory>"
-  exit 1
-fi
+subcommand="$1"
+case "$subcommand" in 
+  run)
+    project="$2"
 
-if [ -d "$project" ]; then
-  run_project "$project"
-else 
-  echo "Directory '$project' does not exist."
-  status=1
-fi
+    if [ -z "$project" ]; then
+      usage
+      exit 1
+    fi
+
+    if [ -d "$project" ]; then
+      run_project "$project"
+    else 
+      echo "Directory '$project' does not exist."
+      status=1
+    fi
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
 
 if [ "$status" -eq 0 ]; then
   echo "SUCCESS"
