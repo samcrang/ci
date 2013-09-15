@@ -55,6 +55,28 @@ case "$subcommand" in
       status=1
     fi
     ;;
+
+  init)
+      directory="$2"
+
+      if [ -z "$directory" ]; then
+        usage
+        exit 1
+      fi
+
+      if [ -d "$directory" ]; then
+        scripts=( setup run teardown ) 
+        for file in "${scripts[@]}"; do
+          if [ ! -f "$directory/$file.sh" ]; then
+            echo "#!/usr/bin/env bash" > "$directory/$file.sh"
+          fi
+        done
+        exit 0
+      else
+        echo "Directory '$directory' does not exist."
+        exit 1
+      fi
+    ;;
   *)
     usage
     exit 1
