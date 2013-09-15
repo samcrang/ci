@@ -7,6 +7,7 @@ version() {
 
 teardown() {
   project="$1"
+
   if [ -f "$project/teardown.sh" ]; then
     bash "$project/teardown.sh"
   fi
@@ -14,26 +15,24 @@ teardown() {
 
 setup() {
   project="$1"
+
   if [ -f "$project/setup.sh" ]; then
     bash "$project/setup.sh"
   fi
 }
 
 run_project() {
-  if [ -d "$project" ]; then
-    if [ -f "$project/run.sh" ]; then
-      setup "$project"
-      set +e
-      bash "$project/run.sh" 
-      status=$?
-      set -e
-      teardown "$project"
-    else
-      echo "Cannot find run.sh"
-      status=1
-    fi
-  else 
-    echo "Directory '$project' does not exist."
+  project="$1"
+
+  if [ -f "$project/run.sh" ]; then
+    setup "$project"
+    set +e
+    bash "$project/run.sh" 
+    status=$?
+    set -e
+    teardown "$project"
+  else
+    echo "Cannot find run.sh"
     status=1
   fi
 }
@@ -45,7 +44,12 @@ if [ -z "$project" ]; then
   exit 1
 fi
 
-run_project "$project"
+if [ -d "$project" ]; then
+  run_project "$project"
+else 
+  echo "Directory '$project' does not exist."
+  status=1
+fi
 
 if [ "$status" -eq 0 ]; then
   echo "SUCCESS"
