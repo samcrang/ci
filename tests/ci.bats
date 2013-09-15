@@ -8,7 +8,7 @@
 }
 
 @test "when invoked with a directory should run script" {
-  run bin/ci tests/data/projects/simple
+  run bin/ci tests/data/projects/passing_run_sh
   [ "$status" -eq 0 ]
   [ "$output" = "SUCCESS" ]
 }
