@@ -23,11 +23,7 @@ if [ -d "$project" ]; then
     bash "$project/run.sh" 
     status=$?
     teardown "$project"
-    if [ "$status" -ne 0 ]; then
-      echo "FAILURE"
-      exit 1
-    fi
-  else
+ else
     echo "Cannot find run.sh"
     exit 1
   fi
@@ -36,5 +32,10 @@ else
   exit 1
 fi
 
-echo "SUCCESS"
-exit 0
+if [ "$status" -eq 0 ]; then
+  echo "SUCCESS"
+  exit 0
+else
+  echo "FAILURE"
+  exit 1
+fi
