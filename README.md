@@ -15,4 +15,4 @@ Goals
 
 - Minimal number of dependenices.
 - Low memory usage.
-
+- Versionable configuration.
