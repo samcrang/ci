@@ -11,6 +11,22 @@ teardown() {
   fi
 }
 
+run_project() {
+  if [ -d "$project" ]; then
+    if [ -f "$project/run.sh" ]; then
+      bash "$project/run.sh" 
+      status=$?
+      teardown "$project"
+    else
+      echo "Cannot find run.sh"
+      exit 1
+    fi
+  else 
+    echo "Directory '$project' does not exist."
+    exit 1
+  fi
+}
+
 project="$1"
 if [ -z "$project" ]; then
   version
@@ -18,19 +34,7 @@ if [ -z "$project" ]; then
   exit 1
 fi
 
-if [ -d "$project" ]; then
-  if [ -f "$project/run.sh" ]; then
-    bash "$project/run.sh" 
-    status=$?
-    teardown "$project"
- else
-    echo "Cannot find run.sh"
-    exit 1
-  fi
-else 
-  echo "Directory '$project' does not exist."
-  exit 1
-fi
+run_project "$project"
 
 if [ "$status" -eq 0 ]; then
   echo "SUCCESS"
