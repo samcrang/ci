@@ -4,6 +4,13 @@ version() {
   echo "CI 0.0.1"
 }
 
+teardown() {
+  project="$1"
+  if [ -f "$project/teardown.sh" ]; then
+    bash "$project/teardown.sh"
+  fi
+}
+
 project="$1"
 if [ -z "$project" ]; then
   version
@@ -14,15 +21,11 @@ fi
 if [ -d "$project" ]; then
   if [ -f "$project/run.sh" ]; then
     bash "$project/run.sh" 
-    if [ $? -ne 0 ]; then
-      if [ -f "$project/teardown.sh" ]; then
-        bash "$project/teardown.sh"
-      fi
+    status=$?
+    teardown "$project"
+    if [ "$status" -ne 0 ]; then
       echo "FAILURE"
       exit 1
-    fi
-    if [ -f "$project/teardown.sh" ]; then
-      bash "$project/teardown.sh"
     fi
   else
     echo "Cannot find run.sh"
