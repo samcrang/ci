@@ -54,6 +54,14 @@ case "$subcommand" in
       echo "Directory '$project' does not exist."
       exit 1
     fi
+
+    if [ "$status" -eq 0 ]; then
+      echo "SUCCESS"
+      exit 0
+    else
+      echo "FAILURE"
+      exit 1
+    fi
     ;;
 
   init)
@@ -83,10 +91,3 @@ case "$subcommand" in
     ;;
 esac
 
-if [ "$status" -eq 0 ]; then
-  echo "SUCCESS"
-  exit 0
-else
-  echo "FAILURE"
-  exit 1
-fi
