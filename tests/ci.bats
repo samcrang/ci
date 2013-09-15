@@ -17,12 +17,14 @@
   run bin/ci foo 
   [ "$status" -eq 1 ]
   [ "${lines[0]}" = "Directory 'foo' does not exist." ]
+  [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when invoked with a directory that exists but does not contain a run.sh should error" {
   run bin/ci tests/data/projects/no_run_sh
   [ "$status" -eq 1 ]
-  [ "$output" = "Cannot find run.sh" ]
+  [ "${lines[0]}" = "Cannot find run.sh" ]
+  [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that fails should error" {

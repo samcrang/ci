@@ -19,11 +19,11 @@ run_project() {
       teardown "$project"
     else
       echo "Cannot find run.sh"
-      exit 1
+      status=1
     fi
   else 
     echo "Directory '$project' does not exist."
-    exit 1
+    status=1
   fi
 }
 
