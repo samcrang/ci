@@ -13,16 +13,16 @@ fi
 
 if [ -d "$project" ]; then
   if [ -f "$project/run.sh" ]; then
-    sh "$project/run.sh" 
+    bash "$project/run.sh" 
     if [ $? -ne 0 ]; then
       if [ -f "$project/teardown.sh" ]; then
-        sh "$project/teardown.sh"
+        bash "$project/teardown.sh"
       fi
       echo "FAILURE"
       exit 1
     fi
     if [ -f "$project/teardown.sh" ]; then
-      sh "$project/teardown.sh"
+      bash "$project/teardown.sh"
     fi
   else
     echo "Cannot find run.sh"
