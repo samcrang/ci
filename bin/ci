@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 version() {
   echo "CI 0.0.1"
@@ -14,8 +15,10 @@ teardown() {
 run_project() {
   if [ -d "$project" ]; then
     if [ -f "$project/run.sh" ]; then
+      set +e
       bash "$project/run.sh" 
       status=$?
+      set -e
       teardown "$project"
     else
       echo "Cannot find run.sh"
