@@ -18,6 +18,9 @@ if [ -d "$project" ]; then
       echo "FAILURE"
       exit 1
     fi
+    if [ -f "$project/teardown.sh" ]; then
+      sh "$project/teardown.sh"
+    fi
   else
     echo "Cannot find run.sh"
     exit 1

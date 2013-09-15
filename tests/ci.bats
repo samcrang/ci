@@ -30,3 +30,10 @@
   [ "$status" -eq 1 ]
   [ "$output" = "FAILURE" ]
 }
+
+@test "when invoked with a valid project that has a run.sh that succeeds should execute teardown.sh" {
+  run bin/ci tests/data/projects/finalize_on_success
+  [ "$status" -eq 0 ]
+  [ $(expr "${lines[0]}" : "Tear down") -ne 0 ]
+  [ $(expr "${lines[1]}" : "SUCCESS") -ne 0 ]
+}
