@@ -46,3 +46,17 @@
   [ "${lines[0]}" = "Tear down" ]
   [ "${lines[1]}" = "FAILURE" ]
 }
+
+@test "when a setup.sh is available should execute before run.sh" {
+  run bin/ci tests/data/projects/with_setup
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" = "Setup" ]
+  [ "${lines[1]}" = "SUCCESS" ]
+}
+
+@test "when a setup.sh is available but a run.sh is not should return error" {
+  run bin/ci tests/data/projects/with_setup_no_run_sh
+  [ "$status" -eq 1 ]
+  [ "${lines[0]}" = "Cannot find run.sh" ]
+  [ "${lines[1]}" = "FAILURE" ]
+}
