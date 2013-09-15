@@ -37,3 +37,10 @@
   [ $(expr "${lines[0]}" : "Tear down") -ne 0 ]
   [ $(expr "${lines[1]}" : "SUCCESS") -ne 0 ]
 }
+
+@test "when invoked with a valid project that has a run.sh that fails should execute teardown.sh" {
+  run bin/ci tests/data/projects/finalize_on_failure
+  [ "$status" -eq 1 ]
+  [ $(expr "${lines[0]}" : "Tear down") -ne 0 ]
+  [ $(expr "${lines[1]}" : "FAILURE") -ne 0 ]
+}
