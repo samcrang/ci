@@ -52,7 +52,7 @@ case "$subcommand" in
       run_project "$project"
     else 
       echo "Directory '$project' does not exist."
-      status=1
+      exit 1
     fi
     ;;
 

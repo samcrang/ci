@@ -10,7 +10,6 @@
   run bin/ci run foo
   [ "$status" -eq 1 ]
   [ "${lines[0]}" = "Directory 'foo' does not exist." ]
-  [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when invoked with no directory should print usage" {
