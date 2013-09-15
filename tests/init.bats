@@ -1,5 +1,13 @@
 #!/usr/bin/env bats
 
+setup() {
+  mkdir -p tmp
+}
+
+teardown() {
+  rm -rf tmp
+}
+
 @test "when invoked without directory prints usage" {
   run bin/ci init
   [ "$status" -eq 1 ]
@@ -14,8 +22,6 @@
 }
 
 @test "when invoked with a valid directory should create empty scripts" {
-  mkdir -p tmp
-  rm -f tmp/*
   run bin/ci init tmp
   [ "$status" -eq 0 ]
   [ `wc -c tmp/setup.sh | awk '{print $1}'` -gt 0 ]
@@ -24,8 +30,6 @@
 }
 
 @test "when invoked with a valid directory should not overrwrite files if they already exist" {
-  mkdir -p tmp
-  rm -f tmp/*
   touch "tmp/setup.sh"
   run bin/ci init tmp
   [ "$status" -eq 0 ]
