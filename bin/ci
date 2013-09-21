@@ -28,7 +28,7 @@ run_project() {
   if [ -f "$project/run.sh" ]; then
     setup "$project"
     set +e
-    bash "$project/run.sh" 
+    bash "$project/run.sh"
     status=$?
     set -e
     teardown "$project"
@@ -39,7 +39,7 @@ run_project() {
 }
 
 subcommand="$1"
-case "$subcommand" in 
+case "$subcommand" in
   run)
     project="$2"
 
@@ -50,7 +50,7 @@ case "$subcommand" in
 
     if [ -d "$project" ]; then
       run_project "$project"
-    else 
+    else
       echo "Directory '$project' does not exist."
       exit 1
     fi
@@ -73,7 +73,7 @@ case "$subcommand" in
       fi
 
       if [ -d "$directory" ]; then
-        scripts=( setup run teardown ) 
+        scripts=( setup run teardown )
         for file in "${scripts[@]}"; do
           if [ ! -f "$directory/$file.sh" ]; then
             echo "#!/usr/bin/env bash" > "$directory/$file.sh"
