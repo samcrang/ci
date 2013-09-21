@@ -16,7 +16,7 @@
   run bin/ci run
   [ "$status" -eq 1 ]
   [ $(expr "${lines[0]}" : "CI") -ne 0 ]
-  [ $(expr "${lines[2]}" : "usage:") -ne 0 ]
+  [ $(expr "${lines[1]}" : "usage:") -ne 0 ]
 }
 
 @test "when invoked with a directory that exists but does not contain a run.sh should error" {
