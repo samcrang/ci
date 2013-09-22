@@ -1,7 +1,18 @@
 #!/usr/bin/env bats
 
+load test_helper
+
+setup() {
+  mkdir -p tmp
+}
+
+teardown() {
+  rm -rf tmp
+}
+
 @test "when invoked with a directory should run script" {
-  run bin/ci run tests/data/projects/passing_run_sh
+  passing_run_sh
+  run bin/ci run tmp/
   [ "$status" -eq 0 ]
   [ "$output" = "SUCCESS" ]
 }
@@ -20,41 +31,49 @@
 }
 
 @test "when invoked with a directory that exists but does not contain a run.sh should error" {
-  run bin/ci run tests/data/projects/no_run_sh
+  run bin/ci run tmp
   [ "$status" -eq 1 ]
   [ "${lines[0]}" = "Cannot find run.sh" ]
   [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that fails should error" {
-  run bin/ci run tests/data/projects/failing_run_sh
+  failing_run_sh
+  run bin/ci run tmp
   [ "$status" -eq 1 ]
   [ "$output" = "FAILURE" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that succeeds should execute teardown.sh" {
-  run bin/ci run tests/data/projects/tear_down_on_success
+  passing_run_sh
+  with_teardown
+  run bin/ci run tmp
   [ "$status" -eq 0 ]
   [ "${lines[0]}" = "Tear down" ]
   [ "${lines[1]}" = "SUCCESS" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that fails should execute teardown.sh" {
-  run bin/ci run tests/data/projects/tear_down_on_failure
+  failing_run_sh
+  with_teardown
+  run bin/ci run tmp
   [ "$status" -eq 1 ]
   [ "${lines[0]}" = "Tear down" ]
   [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when a setup.sh is available should execute before run.sh" {
-  run bin/ci run tests/data/projects/with_setup
+  passing_run_sh
+  with_setup
+  run bin/ci run tmp
   [ "$status" -eq 0 ]
   [ "${lines[0]}" = "Setup" ]
   [ "${lines[1]}" = "SUCCESS" ]
 }
 
 @test "when a setup.sh is available but a run.sh is not should return error" {
-  run bin/ci run tests/data/projects/with_setup_no_run_sh
+  with_setup
+  run bin/ci run tmp
   [ "$status" -eq 1 ]
   [ "${lines[0]}" = "Cannot find run.sh" ]
   [ "${lines[1]}" = "FAILURE" ]
