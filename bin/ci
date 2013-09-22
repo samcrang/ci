@@ -7,8 +7,8 @@ usage() {
 }
 
 teardown() {
-  project="$1"
-  run_number="$2"
+  local project="$1"
+  local run_number="$2"
 
   if [ -f "$project/teardown.sh" ]; then
     bash "$project/teardown.sh" | tee -a "$project/builds/$run_number/log"
@@ -16,8 +16,8 @@ teardown() {
 }
 
 setup() {
-  project="$1"
-  run_number="$2"
+  local project="$1"
+  local run_number="$2"
 
   if [ -f "$project/setup.sh" ]; then
     bash "$project/setup.sh" | tee -a "$project/builds/$run_number/log"
@@ -25,16 +25,17 @@ setup() {
 }
 
 run_project() {
-  project="$1"
-  run_number="$2"
+  local project="$1"
+  local run_number="$2"
+  local output
 
   if [ -f "$project/run.sh" ]; then
     setup "$project" "$run_number"
     set +e
-    OUTPUT=$(bash "$project/run.sh")
+    output=$(bash "$project/run.sh")
     status=$?
     set -e
-    echo "$OUTPUT" | tee -a "$project/builds/$run_number/log"
+    echo "$output" | tee -a "$project/builds/$run_number/log"
     teardown "$project" "$run_number"
   else
     echo "Cannot find run.sh"
@@ -43,7 +44,7 @@ run_project() {
 }
 
 next_run_number() {
-  project="$1"
+  local project="$1"
 
   next_run_number=$(($(ls "$project/builds" | sort -nr | head -n 1) + 1))
 }
