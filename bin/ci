@@ -91,7 +91,11 @@ case "$subcommand" in
         scripts=( setup run teardown )
         for file in "${scripts[@]}"; do
           if [ ! -f "$directory/$file.sh" ]; then
-            echo "#!/usr/bin/env bash" > "$directory/$file.sh"
+            cat > "$directory/$file.sh" <<EOF
+#!/usr/bin/env bash
+set -e
+
+EOF
           fi
         done
         exit 0
