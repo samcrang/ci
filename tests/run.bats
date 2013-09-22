@@ -14,7 +14,8 @@ teardown() {
   passing_run_sh
   run bin/ci run tmp/
   [ "$status" -eq 0 ]
-  [ "$output" = "SUCCESS" ]
+  [ "${lines[0]}" = "Pass" ]
+  [ "${lines[1]}" = "SUCCESS" ]
 }
 
 @test "when invoked with a directory that does not exist should error" {
@@ -40,8 +41,8 @@ teardown() {
 @test "when invoked with a valid project that has a run.sh that fails should error" {
   failing_run_sh
   run bin/ci run tmp
-  [ "$status" -eq 1 ]
-  [ "$output" = "FAILURE" ]
+  [ "${lines[0]}" = "Fail" ]
+  [ "${lines[1]}" = "FAILURE" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that succeeds should execute teardown.sh" {
@@ -49,8 +50,9 @@ teardown() {
   with_teardown
   run bin/ci run tmp
   [ "$status" -eq 0 ]
-  [ "${lines[0]}" = "Tear down" ]
-  [ "${lines[1]}" = "SUCCESS" ]
+  [ "${lines[0]}" = "Pass" ]
+  [ "${lines[1]}" = "Tear down" ]
+  [ "${lines[2]}" = "SUCCESS" ]
 }
 
 @test "when invoked with a valid project that has a run.sh that fails should execute teardown.sh" {
@@ -58,8 +60,9 @@ teardown() {
   with_teardown
   run bin/ci run tmp
   [ "$status" -eq 1 ]
-  [ "${lines[0]}" = "Tear down" ]
-  [ "${lines[1]}" = "FAILURE" ]
+  [ "${lines[0]}" = "Fail" ]
+  [ "${lines[1]}" = "Tear down" ]
+  [ "${lines[2]}" = "FAILURE" ]
 }
 
 @test "when a setup.sh is available should execute before run.sh" {
@@ -68,7 +71,8 @@ teardown() {
   run bin/ci run tmp
   [ "$status" -eq 0 ]
   [ "${lines[0]}" = "Setup" ]
-  [ "${lines[1]}" = "SUCCESS" ]
+  [ "${lines[1]}" = "Pass" ]
+  [ "${lines[2]}" = "SUCCESS" ]
 }
 
 @test "when a setup.sh is available but a run.sh is not should return error" {
