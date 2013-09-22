@@ -7,36 +7,37 @@ usage() {
 }
 
 teardown() {
-  local project="$1"
-  local run_number="$2"
+  local tear_down_script="$project/teardown.sh"
 
-  if [ -f "$project/teardown.sh" ]; then
-    bash "$project/teardown.sh" | tee -a "$project/builds/$run_number/log"
+  if [ -f "$tear_down_script" ]; then
+    bash "$tear_down_script" | tee -a "$build_log"
   fi
 }
 
 setup() {
-  local project="$1"
-  local run_number="$2"
+  local setup_script="$project/setup.sh"
 
-  if [ -f "$project/setup.sh" ]; then
-    bash "$project/setup.sh" | tee -a "$project/builds/$run_number/log"
+  if [ -f "$setup_script" ]; then
+    bash "$setup_script" | tee -a "$build_log"
   fi
 }
 
+run() {
+  set +e
+  output=$(bash "$run_script")
+  status=$?
+  set -e
+  echo "$output" | tee -a "$build_log"
+}
+
 run_project() {
-  local project="$1"
-  local run_number="$2"
+  local run_script="$project/run.sh"
   local output
 
-  if [ -f "$project/run.sh" ]; then
-    setup "$project" "$run_number"
-    set +e
-    output=$(bash "$project/run.sh")
-    status=$?
-    set -e
-    echo "$output" | tee -a "$project/builds/$run_number/log"
-    teardown "$project" "$run_number"
+  if [ -f "$run_script" ]; then
+    setup
+    run
+    teardown
   else
     echo "Cannot find run.sh"
     status=1
@@ -44,9 +45,7 @@ run_project() {
 }
 
 next_run_number() {
-  local project="$1"
-
-  next_run_number=$(($(ls "$project/builds" | sort -nr | head -n 1) + 1))
+  run_number=$(($(ls "$project/builds" | sort -nr | head -n 1) + 1))
 }
 
 subcommand="$1"
@@ -61,21 +60,22 @@ case "$subcommand" in
 
     if [ -d "$project" ]; then
       mkdir -p "$project/builds"
-      next_run_number "$project"
-      mkdir -p "$project/builds/$next_run_number"
-      touch "$project/builds/$next_run_number/log"
+      next_run_number
+      mkdir -p "$project/builds/$run_number"
+      build_log="$project/builds/$run_number/log"
+      touch "$build_log"
 
-      run_project "$project" "$next_run_number"
+      run_project
     else
       echo "Directory '$project' does not exist."
       exit 1
     fi
 
     if [ "$status" -eq 0 ]; then
-      echo "SUCCESS" | tee -a "$project/builds/$next_run_number/log"
+      echo "SUCCESS" | tee -a "$build_log"
       exit 0
     else
-      echo "FAILURE" | tee -a "$project/builds/$next_run_number/log"
+      echo "FAILURE" | tee -a "$build_log"
       exit 1
     fi
     ;;
