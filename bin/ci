@@ -8,34 +8,44 @@ usage() {
 
 teardown() {
   project="$1"
+  run_number="$2"
 
   if [ -f "$project/teardown.sh" ]; then
-    bash "$project/teardown.sh"
+    bash "$project/teardown.sh" | tee -a "$project/builds/$run_number/log"
   fi
 }
 
 setup() {
   project="$1"
+  run_number="$2"
 
   if [ -f "$project/setup.sh" ]; then
-    bash "$project/setup.sh"
+    bash "$project/setup.sh" | tee -a "$project/builds/$run_number/log"
   fi
 }
 
 run_project() {
   project="$1"
+  run_number="$2"
 
   if [ -f "$project/run.sh" ]; then
-    setup "$project"
+    setup "$project" "$run_number"
     set +e
-    bash "$project/run.sh"
+    OUTPUT=$(bash "$project/run.sh")
     status=$?
     set -e
-    teardown "$project"
+    echo "$OUTPUT" | tee -a "$project/builds/$run_number/log"
+    teardown "$project" "$run_number"
   else
     echo "Cannot find run.sh"
     status=1
   fi
+}
+
+next_run_number() {
+  project="$1"
+
+  next_run_number=$(($(ls "$project/builds" | sort -nr | head -n 1) + 1))
 }
 
 subcommand="$1"
@@ -49,17 +59,22 @@ case "$subcommand" in
     fi
 
     if [ -d "$project" ]; then
-      run_project "$project"
+      mkdir -p "$project/builds"
+      next_run_number "$project"
+      mkdir -p "$project/builds/$next_run_number"
+      touch "$project/builds/$next_run_number/log"
+
+      run_project "$project" "$next_run_number"
     else
       echo "Directory '$project' does not exist."
       exit 1
     fi
 
     if [ "$status" -eq 0 ]; then
-      echo "SUCCESS"
+      echo "SUCCESS" | tee -a "$project/builds/$next_run_number/log"
       exit 0
     else
-      echo "FAILURE"
+      echo "FAILURE" | tee -a "$project/builds/$next_run_number/log"
       exit 1
     fi
     ;;
@@ -90,4 +105,3 @@ case "$subcommand" in
     exit 1
     ;;
 esac
-

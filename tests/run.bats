@@ -82,3 +82,32 @@ teardown() {
   [ "${lines[0]}" = "Cannot find run.sh" ]
   [ "${lines[1]}" = "FAILURE" ]
 }
+
+@test "should persist run output on a successful run to a file" {
+  passing_run_sh
+  with_setup
+  with_teardown
+  run bin/ci run tmp
+  run bin/ci run tmp
+  [ `grep "Setup" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "Pass" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "Tear down" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "SUCCESS" tmp/builds/1/log | wc -l` -gt 0 ]
+
+  [ `grep "Setup" tmp/builds/2/log | wc -l` -gt 0 ]
+  [ `grep "Pass" tmp/builds/2/log | wc -l` -gt 0 ]
+  [ `grep "Tear down" tmp/builds/2/log | wc -l` -gt 0 ]
+  [ `grep "SUCCESS" tmp/builds/2/log | wc -l` -gt 0 ]
+
+}
+
+@test "should persist run output on a failing run to a file" {
+  failing_run_sh
+  with_setup
+  with_teardown
+  run bin/ci run tmp
+  [ `grep "Setup" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "Fail" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "Tear down" tmp/builds/1/log | wc -l` -gt 0 ]
+  [ `grep "FAILURE" tmp/builds/1/log | wc -l` -gt 0 ]
+}
