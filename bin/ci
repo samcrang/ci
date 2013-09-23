@@ -105,6 +105,16 @@ EOF
         exit 1
       fi
     ;;
+
+  list)
+    directory="$2"
+      for dir in `ls "$directory" | sort -d`
+      do
+        if [ -f "$directory/$dir/run.sh" ]; then
+          echo $dir
+        fi
+      done
+    ;;
   *)
     usage
     exit 1
