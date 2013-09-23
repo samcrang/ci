@@ -1,7 +1,7 @@
-Simple Bash CI Server
+Simple Bash CI System
 =====================
 
-A _very_ simple continuous integration server written in Bash.
+A _very_ simple continuous integration system written in Bash.
 
 Why?
 ----
