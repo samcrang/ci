@@ -81,39 +81,39 @@ case "$subcommand" in
     ;;
 
   init)
-      directory="$2"
+    directory="$2"
 
-      if [ -z "$directory" ]; then
-        usage
-        exit 1
-      fi
+    if [ -z "$directory" ]; then
+      usage
+      exit 1
+    fi
 
-      if [ -d "$directory" ]; then
-        scripts=( setup run teardown trigger )
-        for file in "${scripts[@]}"; do
-          if [ ! -f "$directory/$file.sh" ]; then
-            cat > "$directory/$file.sh" <<EOF
+    if [ -d "$directory" ]; then
+      scripts=( setup run teardown trigger )
+      for file in "${scripts[@]}"; do
+        if [ ! -f "$directory/$file.sh" ]; then
+          cat > "$directory/$file.sh" <<EOF
 #!/usr/bin/env bash
 set -e
 
 EOF
-          fi
-        done
-        exit 0
-      else
-        echo "Directory '$directory' does not exist."
-        exit 1
-      fi
+        fi
+      done
+      exit 0
+    else
+      echo "Directory '$directory' does not exist."
+      exit 1
+    fi
     ;;
 
   list)
     directory="$2"
-      for dir in `ls "$directory" | sort -d`
-      do
-        if [ -f "$directory/$dir/run.sh" ]; then
-          echo $dir
-        fi
-      done
+    for dir in `ls "$directory" | sort -d`
+    do
+      if [ -f "$directory/$dir/run.sh" ]; then
+        echo $dir
+      fi
+    done
     ;;
   *)
     usage
