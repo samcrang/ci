@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -e
+
+usage() {
+  echo "CI 0.0.1"
+  echo "usage: $0 <directory>"
+}
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+CI_LIBEXEC="$(abs_dirname "$0")"
+
+subcommand="$1"
+case "$subcommand" in
+  run)
+    project="$2"
+
+    if [ -z "$project" ]; then
+      usage
+      exit 1
+    fi
+
+    bash "$CI_LIBEXEC/ci-run" "$project"
+    ;;
+
+  init)
+    directory="$2"
+
+    if [ -z "$directory" ]; then
+      usage
+      exit 1
+    fi
+
+    bash "$CI_LIBEXEC/ci-init" "$directory"
+    ;;
+
+  list)
+    directory="$2"
+
+    if [ -z "$directory" ]; then
+      usage
+      exit 1
+    fi
+
+    bash "$CI_LIBEXEC/ci-list" "$directory"
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
