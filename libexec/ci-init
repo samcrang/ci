@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+directory="$1"
+
+if [ -d "$directory" ]; then
+  scripts=( setup run teardown trigger )
+  for file in "${scripts[@]}"; do
+    if [ ! -f "$directory/$file.sh" ]; then
+      cat > "$directory/$file.sh" <<EOF
+#!/usr/bin/env bash
+set -e
+
+EOF
+    fi
+  done
+  exit 0
+else
+  echo "Directory '$directory' does not exist."
+  exit 1
+fi

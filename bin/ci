@@ -6,48 +6,6 @@ usage() {
   echo "usage: $0 <directory>"
 }
 
-teardown() {
-  local tear_down_script="$project/teardown.sh"
-
-  if [ -f "$tear_down_script" ]; then
-    bash "$tear_down_script" | tee -a "$build_log"
-  fi
-}
-
-setup() {
-  local setup_script="$project/setup.sh"
-
-  if [ -f "$setup_script" ]; then
-    bash "$setup_script" | tee -a "$build_log"
-  fi
-}
-
-run() {
-  set +e
-  output=$(bash "$run_script")
-  status=$?
-  set -e
-  echo "$output" | tee -a "$build_log"
-}
-
-run_project() {
-  local run_script="$project/run.sh"
-  local output
-
-  if [ -f "$run_script" ]; then
-    setup
-    run
-    teardown
-  else
-    echo "Cannot find run.sh"
-    status=1
-  fi
-}
-
-next_run_number() {
-  run_number=$(($(ls "$project/builds" | sort -nr | head -n 1) + 1))
-}
-
 subcommand="$1"
 case "$subcommand" in
   run)
@@ -58,26 +16,7 @@ case "$subcommand" in
       exit 1
     fi
 
-    if [ -d "$project" ]; then
-      mkdir -p "$project/builds"
-      next_run_number
-      mkdir -p "$project/builds/$run_number"
-      build_log="$project/builds/$run_number/log"
-      touch "$build_log"
-
-      run_project
-    else
-      echo "Directory '$project' does not exist."
-      exit 1
-    fi
-
-    if [ "$status" -eq 0 ]; then
-      echo "SUCCESS" | tee -a "$build_log"
-      exit 0
-    else
-      echo "FAILURE" | tee -a "$build_log"
-      exit 1
-    fi
+    bash libexec/ci-run "$project"
     ;;
 
   init)
@@ -88,22 +27,7 @@ case "$subcommand" in
       exit 1
     fi
 
-    if [ -d "$directory" ]; then
-      scripts=( setup run teardown trigger )
-      for file in "${scripts[@]}"; do
-        if [ ! -f "$directory/$file.sh" ]; then
-          cat > "$directory/$file.sh" <<EOF
-#!/usr/bin/env bash
-set -e
-
-EOF
-        fi
-      done
-      exit 0
-    else
-      echo "Directory '$directory' does not exist."
-      exit 1
-    fi
+    bash libexec/ci-init "$directory"
     ;;
 
   list)
@@ -114,17 +38,7 @@ EOF
       exit 1
     fi
 
-    if [ -d "$directory" ]; then
-      for dir in `ls "$directory" | sort -d`
-      do
-        if [ -f "$directory/$dir/run.sh" ]; then
-          echo $dir
-        fi
-      done
-    else
-      echo "Directory '$directory' does not exist."
-      exit 1
-    fi
+    bash libexec/ci-list "$directory"
     ;;
   *)
     usage

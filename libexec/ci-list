@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+directory="$1"
+
+if [ -d "$directory" ]; then
+  for dir in `ls "$directory" | sort -d`
+  do
+    if [ -f "$directory/$dir/run.sh" ]; then
+      echo $dir
+    fi
+  done
+else
+  echo "Directory '$directory' does not exist."
+  exit 1
+fi
