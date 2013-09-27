@@ -24,15 +24,14 @@ teardown() {
 @test "when invoked with a valid directory should create empty scripts" {
   run bin/ci init tmp
   [ "$status" -eq 0 ]
-  [ `wc -c tmp/setup.sh | awk '{print $1}'` -gt 0 ]
   [ `wc -c tmp/run.sh | awk '{print $1}'` -gt 0 ]
   [ `wc -c tmp/teardown.sh | awk '{print $1}'` -gt 0 ]
   [ `wc -c tmp/trigger.sh | awk '{print $1}'` -gt 0 ]
 }
 
 @test "when invoked with a valid directory should not overrwrite files if they already exist" {
-  touch "tmp/setup.sh"
+  touch "tmp/run.sh"
   run bin/ci init tmp
   [ "$status" -eq 0 ]
-  [ `wc -c tmp/setup.sh | awk '{print $1}'` -eq 0 ]
+  [ `wc -c tmp/run.sh | awk '{print $1}'` -eq 0 ]
 }

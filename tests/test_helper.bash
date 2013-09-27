@@ -41,12 +41,3 @@ set -e
 echo "Tear down"
 EOF
 }
-
-with_setup() {
-  cat > tmp/setup.sh <<EOF
-#!/usr/bin/env bash
-set -e
-
-echo "Setup"
-EOF
-}

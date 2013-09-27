@@ -9,14 +9,6 @@ teardown() {
   fi
 }
 
-setup() {
-  local setup_script="$project/setup.sh"
-
-  if [ -f "$setup_script" ]; then
-    bash "$setup_script" | tee -a "$build_log"
-  fi
-}
-
 run() {
   set +e
   output=$(bash "$run_script")
@@ -32,7 +24,6 @@ run_project() {
   if [ -f "$run_script" ]; then
     if [ ! -f "$project/.lock" ]; then
       touch "$project/.lock"
-      setup
       run
       teardown
       rm "$project/.lock"

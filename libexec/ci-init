@@ -4,7 +4,7 @@ set -e
 directory="$1"
 
 if [ -d "$directory" ]; then
-  scripts=( setup run teardown trigger )
+  scripts=( run teardown trigger )
   for file in "${scripts[@]}"; do
     if [ ! -f "$directory/$file.sh" ]; then
       cat > "$directory/$file.sh" <<EOF

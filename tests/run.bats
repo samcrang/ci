@@ -73,36 +73,15 @@ teardown() {
   [ "${lines[2]}" = "FAILURE" ]
 }
 
-@test "when a setup.sh is available should execute before run.sh" {
-  passing_run_sh
-  with_setup
-  run bin/ci run tmp
-  [ "$status" -eq 0 ]
-  [ "${lines[0]}" = "Setup" ]
-  [ "${lines[1]}" = "Pass" ]
-  [ "${lines[2]}" = "SUCCESS" ]
-}
-
-@test "when a setup.sh is available but a run.sh is not should return error" {
-  with_setup
-  run bin/ci run tmp
-  [ "$status" -eq 1 ]
-  [ "${lines[0]}" = "Cannot find run.sh" ]
-  [ "${lines[1]}" = "FAILURE" ]
-}
-
 @test "should persist run output on a successful run to a file" {
   passing_run_sh
-  with_setup
   with_teardown
   run bin/ci run tmp
   run bin/ci run tmp
-  [ `grep "Setup" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "Pass" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "Tear down" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "SUCCESS" tmp/builds/1/log | wc -l` -gt 0 ]
 
-  [ `grep "Setup" tmp/builds/2/log | wc -l` -gt 0 ]
   [ `grep "Pass" tmp/builds/2/log | wc -l` -gt 0 ]
   [ `grep "Tear down" tmp/builds/2/log | wc -l` -gt 0 ]
   [ `grep "SUCCESS" tmp/builds/2/log | wc -l` -gt 0 ]
@@ -111,10 +90,8 @@ teardown() {
 
 @test "should persist run output on a failing run to a file" {
   failing_run_sh
-  with_setup
   with_teardown
   run bin/ci run tmp
-  [ `grep "Setup" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "Fail" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "Tear down" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "FAILURE" tmp/builds/1/log | wc -l` -gt 0 ]
