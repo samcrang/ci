@@ -12,10 +12,18 @@ teardown() {
 
 @test "when invoked with a directory should run script" {
   passing_run_sh
-  run bin/ci run tmp/
+  run bin/ci run tmp
   [ "$status" -eq 0 ]
   [ "${lines[0]}" = "Pass" ]
   [ "${lines[1]}" = "SUCCESS" ]
+}
+
+@test "should not allow multiple concurrent runs" {
+  passing_run_sh
+  touch tmp/.lock
+  run bin/ci run tmp
+  [ "$status" -eq 1 ]
+  [ "${lines[0]}" = "Project already running." ]
 }
 
 @test "when invoked with a directory that does not exist should error" {
@@ -110,4 +118,17 @@ teardown() {
   [ `grep "Fail" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "Tear down" tmp/builds/1/log | wc -l` -gt 0 ]
   [ `grep "FAILURE" tmp/builds/1/log | wc -l` -gt 0 ]
+}
+
+@test "should add a lock file on run" {
+  slow_run_sh
+  run bin/ci run tmp &
+  sleep 1
+  [ -f "tmp/.lock" ]
+}
+
+@test "should remove lock file after run" {
+  slow_run_sh
+  run bin/ci run tmp
+  [ ! -f "tmp/.lock" ]
 }

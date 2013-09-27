@@ -30,9 +30,15 @@ run_project() {
   local output
 
   if [ -f "$run_script" ]; then
-    setup
-    run
-    teardown
+    if [ ! -f "$project/.lock" ]; then
+      touch "$project/.lock"
+      setup
+      run
+      teardown
+      rm "$project/.lock"
+    else
+      echo "Project already running."
+    fi
   else
     echo "Cannot find run.sh"
     status=1
